@@ -26,16 +26,7 @@ describe('Testa a Página de Login', ()=>{
   })
 
   test('Verifica se é o botão habilita nas circuntâncias corretas.', ()=>{
-    const initialState = {
-      player: {
-        name: 'Player Name',
-        gravatarEmail: 'player@email.com',
-        score: 0,
-        assertions: 0,
-      }
-    }
-
-    renderWithRouterAndRedux(<App />, initialState);
+    renderWithRouterAndRedux(<App />);
 
     const playButton = screen.getByTestId('btn-play');
     expect(playButton.disabled).toBe(true);   
@@ -57,5 +48,37 @@ describe('Testa a Página de Login', ()=>{
     userEvent.type(nameInput, 'J');
     expect(playButton.disabled).toBe(true);
 
-  })
+  });
+
+  test('Verifica se a botão Settings é renderizado.', () =>{
+
+    const {history} = renderWithRouterAndRedux(<App />);
+
+    const settingsButton = screen.getByTestId('btn-settings');
+
+    expect(settingsButton).toBeInTheDocument();
+
+    userEvent.click(settingsButton);
+
+    expect(history.location.pathname).toBe('/settings');
+
+
+  });
+
+  test('Verifica se o botão Play chama o fetchTokenThunk', () => {
+    global.fetch = jest.fn().mockResolvedValue({JSON: async () => mockAPI });
+
+    renderWithRouterAndRedux(<App />);
+
+    const nameInput = screen.getByTestId('input-player-name');
+    const emailInput = screen.getByTestId('input-gravatar-email');
+
+    userEvent.type(nameInput, 'Juca');
+    userEvent.type(emailInput, 'email@email.com');
+
+    const playButton = screen.getByTestId('btn-play');
+    userEvent.click(playButton);
+
+    expect(global.fetch).toHaveBeenCalled();
+  });
 })
