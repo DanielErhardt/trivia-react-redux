@@ -40,7 +40,7 @@ class Login extends React.Component {
     const { history, registerPlayer } = this.props;
     const { name, gravatarEmail } = this.state;
     registerPlayer(name, gravatarEmail);
-    history.push('/carteira');
+    history.push('/');
   }
 
   render() {
