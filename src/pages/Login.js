@@ -42,7 +42,7 @@ class Login extends React.Component {
     const { name, gravatarEmail } = this.state;
     registerPlayer(name, gravatarEmail);
     await fetchToken();
-    history.push('/jogo');
+    history.push('/jogoo');
   }
 
   onClickSettings = () => {
