@@ -1,8 +1,8 @@
 import { combineReducers } from 'redux';
 import player from './player';
-// import wallet from './wallet';
+import token from './token';
 
 // const reducer = combineReducers({ user, wallet });
-const reducer = combineReducers({ player });
+const reducer = combineReducers({ player, token });
 
 export default reducer;
