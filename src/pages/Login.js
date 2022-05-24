@@ -1,7 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { registerPlayerAction } from '../redux/actions';
+import { registerPlayerAction } from '../redux/actions/player';
+import { fetchTokenThunk } from '../redux/actions/token';
 import logo from '../trivia.png';
 
 class Login extends React.Component {
@@ -36,11 +37,12 @@ class Login extends React.Component {
     });
   }
 
-  onLoggedIn = () => {
-    const { history, registerPlayer } = this.props;
+  onClickPlay = async () => {
+    const { history, registerPlayer, fetchToken } = this.props;
     const { name, gravatarEmail } = this.state;
     registerPlayer(name, gravatarEmail);
-    history.push('/');
+    await fetchToken();
+    history.push('/jogo');
   }
 
   render() {
@@ -74,7 +76,7 @@ class Login extends React.Component {
           type="button"
           data-testid="btn-play"
           disabled={ isButtonDisabled }
-          onClick={ this.onLoggedIn }
+          onClick={ this.onClickPlay }
         >
           Play
         </button>
@@ -86,11 +88,13 @@ class Login extends React.Component {
 Login.propTypes = {
   history: PropTypes.shape.isRequired,
   registerPlayer: PropTypes.func.isRequired,
+  fetchToken: PropTypes.func.isRequired,
 };
 
 const mapDispatchToProps = (dispatch) => ({
   registerPlayer:
   (name, gravatarEmail) => dispatch(registerPlayerAction(name, gravatarEmail)),
+  fetchToken: async () => dispatch(fetchTokenThunk()),
 });
 
 export default connect(null, mapDispatchToProps)(Login);

@@ -1,5 +1,4 @@
-// Esse reducer será responsável por tratar as informações da pessoa usuária
-import { REGISTER_PLAYER } from '../actions';
+import { REGISTER_PLAYER } from '../actions/player';
 
 const INITIAL_STATE = {
   name: '',
