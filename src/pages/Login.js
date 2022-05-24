@@ -42,7 +42,12 @@ class Login extends React.Component {
     const { name, gravatarEmail } = this.state;
     registerPlayer(name, gravatarEmail);
     await fetchToken();
-    history.push('/jogo');
+    history.push('/jogoo');
+  }
+
+  onClickSettings = () => {
+    const { history } = this.props;
+    history.push('/settings');
   }
 
   render() {
@@ -54,32 +59,39 @@ class Login extends React.Component {
         <header className="App-header">
           <img src={ logo } className="App-logo" alt="logo" />
           <p>SUA VEZ</p>
+
+          <input
+            type="text"
+            data-testid="input-player-name"
+            name="name"
+            value={ name }
+            onChange={ this.handleInputChange }
+          />
+
+          <input
+            type="email"
+            data-testid="input-gravatar-email"
+            name="gravatarEmail"
+            value={ gravatarEmail }
+            onChange={ this.handleInputChange }
+          />
+
+          <button
+            type="button"
+            data-testid="btn-play"
+            disabled={ isButtonDisabled }
+            onClick={ this.onClickPlay }
+          >
+            Play
+          </button>
+          <button
+            type="button"
+            data-testid="btn-settings"
+            onClick={ this.onClickSettings }
+          >
+            Settings
+          </button>
         </header>
-
-        <input
-          type="text"
-          data-testid="input-player-name"
-          name="name"
-          value={ name }
-          onChange={ this.handleInputChange }
-        />
-
-        <input
-          type="email"
-          data-testid="input-gravatar-email"
-          name="gravatarEmail"
-          value={ gravatarEmail }
-          onChange={ this.handleInputChange }
-        />
-
-        <button
-          type="button"
-          data-testid="btn-play"
-          disabled={ isButtonDisabled }
-          onClick={ this.onClickPlay }
-        >
-          Play
-        </button>
       </div>
     );
   }
