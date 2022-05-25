@@ -1,3 +1,4 @@
+import md5 from 'crypto-js/md5';
 import { REGISTER_PLAYER } from '../actions/player';
 
 const INITIAL_STATE = {
@@ -5,6 +6,7 @@ const INITIAL_STATE = {
   gravatarEmail: '',
   score: 0,
   assertions: 0,
+  gravatarURL: '',
 };
 
 const player = (state = INITIAL_STATE, action) => {
@@ -13,6 +15,7 @@ const player = (state = INITIAL_STATE, action) => {
     return {
       ...state,
       gravatarEmail: action.gravatarEmail,
+      gravatarURL: `https://www.gravatar.com/avatar/${md5(action.gravatarEmail).toString()}`,
       name: action.name,
     };
 
