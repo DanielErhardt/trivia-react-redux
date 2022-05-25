@@ -20,7 +20,6 @@ export const fetchTokenFailAction = (error) => ({
 
 export const fetchTokenThunk = () => async (dispatch) => {
   dispatch(fetchTokenAction());
-  console.log('thunk');
   try {
     const response = await fetch(TOKEN_API);
     const sessionToken = await response.json();

@@ -1,12 +1,13 @@
 import { FETCH_TOKEN, FETCH_TOKEN_SUCCESS, FETCH_TOKEN_FAIL } from '../actions/token';
 
 const INITIAL_STATE = {
-  sessionToken: {},
+  responseCode: 0,
+  value: '',
   loading: false,
   error: '',
 };
 
-const player = (state = INITIAL_STATE, action) => {
+const token = (state = INITIAL_STATE, action) => {
   switch (action.type) {
   case FETCH_TOKEN:
     return {
@@ -16,12 +17,15 @@ const player = (state = INITIAL_STATE, action) => {
     };
 
   case FETCH_TOKEN_SUCCESS: {
-    // salva token no localStorage
-    localStorage.setItem('token', action.sessionToken.token);
+    const storedToken = localStorage.getItem('token');
+    if (storedToken === null) {
+      localStorage.setItem('token', action.sessionToken.token);
+    }
     return {
       ...state,
       loading: false,
-      sessionToken: action.sessionToken,
+      responseCode: action.sessionToken.response_code,
+      value: action.sessionToken.token,
       error: '',
     };
   }
@@ -38,4 +42,4 @@ const player = (state = INITIAL_STATE, action) => {
   }
 };
 
-export default player;
+export default token;
