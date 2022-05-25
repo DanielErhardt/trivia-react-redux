@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { registerPlayerAction } from '../redux/actions/player';
 import { fetchTokenThunk } from '../redux/actions/token';
+import { fetchQuestionsThunk } from '../redux/actions/game';
 import logo from '../trivia.png';
 
 class Login extends React.Component {
@@ -38,10 +39,15 @@ class Login extends React.Component {
   }
 
   onClickPlay = async () => {
-    const { history, registerPlayer, fetchToken } = this.props;
+    const {
+      history, registerPlayer, fetchToken, fetchQuestions,
+    } = this.props;
     const { name, gravatarEmail } = this.state;
     registerPlayer(name, gravatarEmail);
+
     await fetchToken();
+    await fetchQuestions();
+
     history.push('/game');
   }
 
@@ -101,12 +107,14 @@ Login.propTypes = {
   history: PropTypes.shape.isRequired,
   registerPlayer: PropTypes.func.isRequired,
   fetchToken: PropTypes.func.isRequired,
+  fetchQuestions: PropTypes.func.isRequired,
 };
 
 const mapDispatchToProps = (dispatch) => ({
   registerPlayer:
   (name, gravatarEmail) => dispatch(registerPlayerAction(name, gravatarEmail)),
   fetchToken: async () => dispatch(fetchTokenThunk()),
+  fetchQuestions: async () => dispatch(fetchQuestionsThunk()),
 });
 
 export default connect(null, mapDispatchToProps)(Login);
