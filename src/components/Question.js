@@ -103,6 +103,7 @@ class Question extends React.Component {
         {(locked) && (
           <button
             type="button"
+            data-testid="btn-next"
             onClick={ () => {
               onClickNext();
               this.resetState();
