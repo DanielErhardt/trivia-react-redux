@@ -10,9 +10,10 @@ class Game extends React.Component {
     super();
 
     this.state = {
-      questionNumber: 0,
+      timer: 30,
+      numberControl: -1,
       currentQuestion: {
-        number: -1,
+        number: 0,
         category: '',
         question: '',
         randomizedAnswers: [],
@@ -20,17 +21,38 @@ class Game extends React.Component {
     };
   }
 
-  onClickNext = () => {
-    const { questionNumber } = this.state;
+  decreaseTimer = () => {
+    const { timer } = this.state;
+
+    if (timer - 1 === 0) clearInterval(this.timer);
+
     this.setState({
-      questionNumber: questionNumber + 1,
+      timer: timer - 1,
+    });
+  }
+
+  restartTimer = () => {
+    const ONE_SECOND = 1000;
+
+    this.setState({
+      timer: 30,
+    }, () => {
+      clearInterval(this.timer);
+      this.timer = setInterval(this.decreaseTimer, ONE_SECOND);
+    });
+  }
+
+  onClickNext = () => {
+    const { numberControl } = this.state;
+    this.setState({
+      numberControl: numberControl + 1,
     });
   }
 
   getCurrentQuestionObject = () => {
-    const { questionNumber, currentQuestion } = this.state;
+    const { numberControl, currentQuestion } = this.state;
 
-    if (currentQuestion.number === questionNumber) return currentQuestion;
+    if (currentQuestion.number === numberControl) return currentQuestion;
 
     const { questions } = this.props;
 
@@ -55,7 +77,7 @@ class Game extends React.Component {
     mappedAnswers.sort(() => Math.random() - SORT_CONST);
 
     const newQuestion = {
-      number: questionNumber,
+      number: numberControl,
       category,
       question,
       randomizedAnswers: mappedAnswers,
@@ -70,11 +92,12 @@ class Game extends React.Component {
 
   render() {
     const { gameResponseCode } = this.props;
-    const TOKEN_INVALID_CODE = 3;
-    if (gameResponseCode === TOKEN_INVALID_CODE) {
+    const INVALID_TOKEN_CODE = 3;
+    if (gameResponseCode === INVALID_TOKEN_CODE) {
       return (<Redirect to="/" />);
     }
 
+    const { timer } = this.state;
     const currentQuestion = this.getCurrentQuestionObject();
 
     console.log(currentQuestion);
@@ -82,6 +105,7 @@ class Game extends React.Component {
     return (
       <div>
         <Header />
+        <p>{ timer }</p>
         <Question
           questionInfo={ currentQuestion }
           onClickNext={ this.onClickNext }
