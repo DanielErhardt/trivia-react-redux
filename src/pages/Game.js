@@ -16,13 +16,13 @@ class Game extends React.Component {
         number: -1,
         category: '',
         question: '',
+        difficulty: '',
         randomizedAnswers: [],
       },
     };
   }
 
   componentDidMount() {
-    console.log('mount');
     this.startTimerInterval();
   }
 
@@ -60,7 +60,7 @@ class Game extends React.Component {
     const { questions } = this.props;
 
     const {
-      category, question,
+      category, question, difficulty,
       correct_answer: correctAnswer,
       incorrect_answers: incorrectAnswers,
     } = questions[questionNumber];
@@ -83,6 +83,7 @@ class Game extends React.Component {
       number: questionNumber,
       category,
       question,
+      difficulty,
       randomizedAnswers: mappedAnswers,
     };
 

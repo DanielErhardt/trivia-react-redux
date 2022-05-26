@@ -1,6 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
+import { addScoreAction } from '../redux/actions/player';
+
+const CORRECT_ANSWER = 'correct-answer';
 
 class Question extends React.Component {
   constructor() {
@@ -21,7 +24,7 @@ class Question extends React.Component {
   paintButtons = () => {
     const buttons = document.querySelectorAll('.answerButton');
     buttons.forEach((button) => {
-      if (button.id === 'correct-answer') {
+      if (button.id === CORRECT_ANSWER) {
         button.classList.add('correctAnswer');
       } else {
         button.classList.add('wrongAnswer');
@@ -37,9 +40,22 @@ class Question extends React.Component {
     });
   }
 
-  onQuestionAnswered = () => {
-    // registrar pontuação
+  onQuestionAnswered = ({ target }) => {
     this.lockQuestion();
+
+    if (target.id === CORRECT_ANSWER) {
+      const { addScore, timer, questionInfo: { difficulty } } = this.props;
+
+      let difficultyMultiplier = 1;
+
+      if (difficulty === 'medium') difficultyMultiplier += 1;
+      if (difficulty === 'hard') difficultyMultiplier += 2;
+
+      const BASE_SCORE = 10;
+      const score = BASE_SCORE + (timer * difficultyMultiplier);
+
+      addScore(score);
+    }
   }
 
   lockQuestion = () => {
@@ -67,7 +83,7 @@ class Question extends React.Component {
           {
             randomizedAnswers.map((answer, index) => {
               const testIdContent = answer.correct
-                ? 'correct-answer' : `wrong-answer-${index}`;
+                ? CORRECT_ANSWER : `wrong-answer-${index}`;
               return (
                 <button
                   className="answerButton"
@@ -105,14 +121,20 @@ Question.propTypes = {
     category: PropTypes.string.isRequired,
     question: PropTypes.string.isRequired,
     randomizedAnswers: PropTypes.arrayOf(PropTypes.string).isRequired,
+    difficulty: PropTypes.string.isRequired,
   }).isRequired,
   onClickNext: PropTypes.func.isRequired,
   stopTimer: PropTypes.func.isRequired,
   timer: PropTypes.number.isRequired,
+  addScore: PropTypes.func.isRequired,
 };
 
 const mapStateToProps = (state) => ({
   timer: state.game.timer,
 });
 
-export default connect(mapStateToProps)(Question);
+const mapDispatchToProps = (dispatch) => ({
+  addScore: (score) => dispatch(addScoreAction(score)),
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)(Question);
