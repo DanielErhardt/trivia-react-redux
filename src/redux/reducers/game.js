@@ -1,10 +1,14 @@
 import {
   FETCH_QUESTIONS, FETCH_QUESTIONS_SUCCESS, FETCH_QUESTIONS_FAIL,
+  RESET_TIMER, DECREASE_TIMER,
 } from '../actions/game';
+
+const INITIAL_TIMER = 30;
 
 const INITIAL_STATE = {
   responseCode: 0,
   questionsInfo: [],
+  timer: INITIAL_TIMER,
   loading: false,
   error: '',
 };
@@ -39,6 +43,18 @@ const game = (state = INITIAL_STATE, action) => {
       ...state,
       loading: false,
       error: action.error,
+    };
+
+  case RESET_TIMER:
+    return {
+      ...state,
+      timer: INITIAL_TIMER,
+    };
+
+  case DECREASE_TIMER:
+    return {
+      ...state,
+      timer: state.timer - 1,
     };
 
   default:

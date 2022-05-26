@@ -4,13 +4,13 @@ import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import Header from '../components/Header';
 import Question from '../components/Question';
+import { resetTimerAction, decreaseTimerAction } from '../redux/actions/game';
 
 class Game extends React.Component {
   constructor() {
     super();
 
     this.state = {
-      timer: 30,
       questionNumber: 0,
       currentQuestion: {
         number: -1,
@@ -22,37 +22,31 @@ class Game extends React.Component {
   }
 
   componentDidMount() {
-    this.startTimer();
+    console.log('mount');
+    this.startTimerInterval();
   }
 
-  decreaseTimer = () => {
-    const { timer } = this.state;
+  // componentWillUnmount() {
+  //   console.log('unmount');
+  //   this.clearTimerInterval();
+  // }
 
-    if (timer - 1 === 0) clearInterval(this.timer);
-
-    this.setState({
-      timer: timer - 1,
-    });
-  }
-
-  startTimer = () => {
+  startTimerInterval = () => {
+    const { decreaseTimer, resetTimer } = this.props;
     const ONE_SECOND = 1000;
 
-    this.setState({
-      timer: 30,
-    }, () => {
-      this.stopTimer();
-      this.timer = setInterval(this.decreaseTimer, ONE_SECOND);
-    });
+    this.clearTimerInterval();
+    resetTimer();
+    this.timer = setInterval(decreaseTimer, ONE_SECOND);
   }
 
-  stopTimer = () => {
+  clearTimerInterval = () => {
     clearInterval(this.timer);
   }
 
   onClickNext = () => {
     const { questionNumber } = this.state;
-    this.startTimer();
+    this.startTimerInterval();
     this.setState({
       questionNumber: questionNumber + 1,
     });
@@ -100,13 +94,13 @@ class Game extends React.Component {
   }
 
   render() {
-    const { gameResponseCode } = this.props;
+    const { responseCode } = this.props;
     const INVALID_TOKEN_CODE = 3;
-    if (gameResponseCode === INVALID_TOKEN_CODE) {
+    if (responseCode === INVALID_TOKEN_CODE) {
       return (<Redirect to="/" />);
     }
 
-    const { timer } = this.state;
+    const { timer } = this.props;
     const currentQuestion = this.getCurrentQuestion();
 
     return (
@@ -116,7 +110,7 @@ class Game extends React.Component {
         <Question
           questionInfo={ currentQuestion }
           onClickNext={ this.onClickNext }
-          stopTimer={ this.stopTimer }
+          stopTimer={ this.clearTimerInterval }
         />
       </div>
     );
@@ -125,12 +119,21 @@ class Game extends React.Component {
 
 Game.propTypes = {
   questions: PropTypes.arrayOf(PropTypes.shape).isRequired,
-  gameResponseCode: PropTypes.number.isRequired,
+  responseCode: PropTypes.number.isRequired,
+  decreaseTimer: PropTypes.func.isRequired,
+  resetTimer: PropTypes.func.isRequired,
+  timer: PropTypes.number.isRequired,
 };
 
 const mapStateToProps = (state) => ({
+  timer: state.game.timer,
   questions: state.game.questionsInfo,
-  gameResponseCode: state.game.responseCode,
+  responseCode: state.game.responseCode,
 });
 
-export default connect(mapStateToProps)(Game);
+const mapDispatchToProps = (dispatch) => ({
+  resetTimer: () => dispatch(resetTimerAction()),
+  decreaseTimer: () => dispatch(decreaseTimerAction()),
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)(Game);

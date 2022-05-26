@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { connect } from 'react-redux';
 
 class Question extends React.Component {
   constructor() {
@@ -37,6 +38,7 @@ class Question extends React.Component {
   }
 
   onQuestionAnswered = () => {
+    // registrar pontuação
     this.lockQuestion();
   }
 
@@ -44,6 +46,7 @@ class Question extends React.Component {
     const { stopTimer } = this.props;
     stopTimer();
     this.paintButtons();
+
     this.setState({
       locked: true,
     });
@@ -51,8 +54,10 @@ class Question extends React.Component {
 
   render() {
     const { locked } = this.state;
-    const { questionInfo, onClickNext } = this.props;
+    const { questionInfo, onClickNext, timer } = this.props;
     const { category, question, randomizedAnswers } = questionInfo;
+
+    if (timer === 0 && !locked) this.lockQuestion();
 
     return (
       <div>
@@ -79,7 +84,7 @@ class Question extends React.Component {
           }
         </div>
         <br />
-        {locked && (
+        {(locked) && (
           <button
             type="button"
             onClick={ () => {
@@ -103,6 +108,11 @@ Question.propTypes = {
   }).isRequired,
   onClickNext: PropTypes.func.isRequired,
   stopTimer: PropTypes.func.isRequired,
+  timer: PropTypes.number.isRequired,
 };
 
-export default Question;
+const mapStateToProps = (state) => ({
+  timer: state.game.timer,
+});
+
+export default connect(mapStateToProps)(Question);
