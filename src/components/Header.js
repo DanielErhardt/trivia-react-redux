@@ -6,7 +6,7 @@ class Header extends React.Component {
   render() {
     const { gravatarURL, playerName, playerScore } = this.props;
     return (
-      <div>
+      <div data-testid="nosso-header">
         <img data-testid="header-profile-picture" src={ gravatarURL } alt="gravatar" />
         <p data-testid="header-player-name">{ playerName }</p>
         <br />
