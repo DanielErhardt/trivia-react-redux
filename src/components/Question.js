@@ -5,14 +5,15 @@ class Question extends React.Component {
   constructor() {
     super();
     this.state = {
-      answered: false,
+      locked: false,
     };
   }
 
-  resetButtonsColor = () => {
+  resetButtons = () => {
     document.querySelectorAll('.answerButton')
       .forEach((button) => {
         button.className = 'answerButton';
+        button.disabled = false;
       });
   }
 
@@ -24,24 +25,32 @@ class Question extends React.Component {
       } else {
         button.classList.add('wrongAnswer');
       }
+
+      button.disabled = true;
     });
   }
 
   resetState = () => {
     this.setState({
-      answered: false,
+      locked: false,
     });
   }
 
   onQuestionAnswered = () => {
+    this.lockQuestion();
+  }
+
+  lockQuestion = () => {
+    const { stopTimer } = this.props;
+    stopTimer();
     this.paintButtons();
     this.setState({
-      answered: true,
+      locked: true,
     });
   }
 
   render() {
-    const { answered } = this.state;
+    const { locked } = this.state;
     const { questionInfo, onClickNext } = this.props;
     const { category, question, randomizedAnswers } = questionInfo;
 
@@ -70,13 +79,13 @@ class Question extends React.Component {
           }
         </div>
         <br />
-        {answered && (
+        {locked && (
           <button
             type="button"
             onClick={ () => {
               onClickNext();
               this.resetState();
-              this.resetButtonsColor();
+              this.resetButtons();
             } }
           >
             Next
@@ -93,6 +102,7 @@ Question.propTypes = {
     randomizedAnswers: PropTypes.arrayOf(PropTypes.string).isRequired,
   }).isRequired,
   onClickNext: PropTypes.func.isRequired,
+  stopTimer: PropTypes.func.isRequired,
 };
 
 export default Question;

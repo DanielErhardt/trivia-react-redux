@@ -11,14 +11,18 @@ class Game extends React.Component {
 
     this.state = {
       timer: 30,
-      numberControl: -1,
+      questionNumber: 0,
       currentQuestion: {
-        number: 0,
+        number: -1,
         category: '',
         question: '',
         randomizedAnswers: [],
       },
     };
+  }
+
+  componentDidMount() {
+    this.startTimer();
   }
 
   decreaseTimer = () => {
@@ -31,28 +35,33 @@ class Game extends React.Component {
     });
   }
 
-  restartTimer = () => {
+  startTimer = () => {
     const ONE_SECOND = 1000;
 
     this.setState({
       timer: 30,
     }, () => {
-      clearInterval(this.timer);
+      this.stopTimer();
       this.timer = setInterval(this.decreaseTimer, ONE_SECOND);
     });
   }
 
+  stopTimer = () => {
+    clearInterval(this.timer);
+  }
+
   onClickNext = () => {
-    const { numberControl } = this.state;
+    const { questionNumber } = this.state;
+    this.startTimer();
     this.setState({
-      numberControl: numberControl + 1,
+      questionNumber: questionNumber + 1,
     });
   }
 
-  getCurrentQuestionObject = () => {
-    const { numberControl, currentQuestion } = this.state;
+  getCurrentQuestion = () => {
+    const { questionNumber, currentQuestion } = this.state;
 
-    if (currentQuestion.number === numberControl) return currentQuestion;
+    if (currentQuestion.number === questionNumber) return currentQuestion;
 
     const { questions } = this.props;
 
@@ -73,11 +82,11 @@ class Game extends React.Component {
       };
     });
 
-    const SORT_CONST = 0.5;
-    mappedAnswers.sort(() => Math.random() - SORT_CONST);
+    const SORT_CONSTANT = 0.5;
+    mappedAnswers.sort(() => Math.random() - SORT_CONSTANT);
 
     const newQuestion = {
-      number: numberControl,
+      number: questionNumber,
       category,
       question,
       randomizedAnswers: mappedAnswers,
@@ -98,9 +107,7 @@ class Game extends React.Component {
     }
 
     const { timer } = this.state;
-    const currentQuestion = this.getCurrentQuestionObject();
-
-    console.log(currentQuestion);
+    const currentQuestion = this.getCurrentQuestion();
 
     return (
       <div>
@@ -109,6 +116,7 @@ class Game extends React.Component {
         <Question
           questionInfo={ currentQuestion }
           onClickNext={ this.onClickNext }
+          stopTimer={ this.stopTimer }
         />
       </div>
     );
