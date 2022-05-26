@@ -1,5 +1,5 @@
 import md5 from 'crypto-js/md5';
-import { REGISTER_PLAYER } from '../actions/player';
+import { REGISTER_PLAYER, ADD_SCORE } from '../actions/player';
 
 const INITIAL_STATE = {
   name: '',
@@ -18,7 +18,10 @@ const player = (state = INITIAL_STATE, action) => {
       gravatarURL: `https://www.gravatar.com/avatar/${md5(action.gravatarEmail).toString()}`,
       name: action.name,
     };
-
+  case ADD_SCORE:
+    return { ...state,
+      score: state.score + action.score,
+    };
   default:
     return state;
   }

@@ -1,49 +1,79 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { connect } from 'react-redux';
+import { addScoreAction } from '../redux/actions/player';
+
+const CORRECT_ANSWER = 'correct-answer';
 
 class Question extends React.Component {
   constructor() {
     super();
     this.state = {
-      answered: false,
+      locked: false,
     };
   }
 
-  resetButtonsColor = () => {
+  resetButtons = () => {
     document.querySelectorAll('.answerButton')
       .forEach((button) => {
         button.className = 'answerButton';
+        button.disabled = false;
       });
   }
 
   paintButtons = () => {
     const buttons = document.querySelectorAll('.answerButton');
     buttons.forEach((button) => {
-      if (button.id === 'correct-answer') {
+      if (button.id === CORRECT_ANSWER) {
         button.classList.add('correctAnswer');
       } else {
         button.classList.add('wrongAnswer');
       }
+
+      button.disabled = true;
     });
   }
 
   resetState = () => {
     this.setState({
-      answered: false,
+      locked: false,
     });
   }
 
-  onQuestionAnswered = () => {
+  onQuestionAnswered = ({ target }) => {
+    this.lockQuestion();
+
+    if (target.id === CORRECT_ANSWER) {
+      const { addScore, timer, questionInfo: { difficulty } } = this.props;
+
+      let difficultyMultiplier = 1;
+
+      if (difficulty === 'medium') difficultyMultiplier += 1;
+      if (difficulty === 'hard') difficultyMultiplier += 2;
+
+      const BASE_SCORE = 10;
+      const score = BASE_SCORE + (timer * difficultyMultiplier);
+
+      addScore(score);
+    }
+  }
+
+  lockQuestion = () => {
+    const { stopTimer } = this.props;
+    stopTimer();
     this.paintButtons();
+
     this.setState({
-      answered: true,
+      locked: true,
     });
   }
 
   render() {
-    const { answered } = this.state;
-    const { questionInfo, onClickNext } = this.props;
+    const { locked } = this.state;
+    const { questionInfo, onClickNext, timer } = this.props;
     const { category, question, randomizedAnswers } = questionInfo;
+
+    if (timer === 0 && !locked) this.lockQuestion();
 
     return (
       <div>
@@ -53,7 +83,7 @@ class Question extends React.Component {
           {
             randomizedAnswers.map((answer, index) => {
               const testIdContent = answer.correct
-                ? 'correct-answer' : `wrong-answer-${index}`;
+                ? CORRECT_ANSWER : `wrong-answer-${index}`;
               return (
                 <button
                   className="answerButton"
@@ -70,13 +100,13 @@ class Question extends React.Component {
           }
         </div>
         <br />
-        {answered && (
+        {(locked) && (
           <button
             type="button"
             onClick={ () => {
               onClickNext();
               this.resetState();
-              this.resetButtonsColor();
+              this.resetButtons();
             } }
           >
             Next
@@ -91,8 +121,20 @@ Question.propTypes = {
     category: PropTypes.string.isRequired,
     question: PropTypes.string.isRequired,
     randomizedAnswers: PropTypes.arrayOf(PropTypes.string).isRequired,
+    difficulty: PropTypes.string.isRequired,
   }).isRequired,
   onClickNext: PropTypes.func.isRequired,
+  stopTimer: PropTypes.func.isRequired,
+  timer: PropTypes.number.isRequired,
+  addScore: PropTypes.func.isRequired,
 };
 
-export default Question;
+const mapStateToProps = (state) => ({
+  timer: state.game.timer,
+});
+
+const mapDispatchToProps = (dispatch) => ({
+  addScore: (score) => dispatch(addScoreAction(score)),
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)(Question);
