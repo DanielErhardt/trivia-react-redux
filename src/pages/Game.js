@@ -46,10 +46,18 @@ class Game extends React.Component {
 
   onClickNext = () => {
     const { questionNumber } = this.state;
-    this.startTimerInterval();
-    this.setState({
-      questionNumber: questionNumber + 1,
-    });
+    const { history } = this.props;
+
+    const LAST_QUESTION = 4;
+    if (questionNumber === LAST_QUESTION) {
+      this.clearTimerInterval();
+      history.push('/feedback');
+    } else {
+      this.startTimerInterval();
+      this.setState({
+        questionNumber: questionNumber + 1,
+      });
+    }
   }
 
   getCurrentQuestion = () => {
@@ -124,6 +132,7 @@ Game.propTypes = {
   decreaseTimer: PropTypes.func.isRequired,
   resetTimer: PropTypes.func.isRequired,
   timer: PropTypes.number.isRequired,
+  history: PropTypes.shape.isRequired,
 };
 
 const mapStateToProps = (state) => ({
