@@ -4,6 +4,17 @@ import PropTypes from 'prop-types';
 import Header from '../components/Header';
 
 class Feedback extends React.Component {
+  onClickPlayAgain = () => {
+    // limpar o store
+    const { history } = this.props;
+    history.push('/');
+  }
+
+  onClickRanking = () => {
+    const { history } = this.props;
+    history.push('/ranking');
+  }
+
   render() {
     const { assertions, finalScore } = this.props;
     const ASSERTIONS = 3;
@@ -14,6 +25,22 @@ class Feedback extends React.Component {
         <p data-testid="feedback-total-score">{finalScore}</p>
         <p data-testid="feedback-total-question">{assertions}</p>
         <p data-testid="feedback-text">{feedbackText}</p>
+
+        <button
+          data-testid="btn-play-again"
+          type="button"
+          onClick={ this.onClickPlayAgain }
+        >
+          Play Again
+        </button>
+
+        <button
+          data-testid="btn-ranking"
+          type="button"
+          onClick={ this.onClickRanking }
+        >
+          Ranking
+        </button>
       </div>
     );
   }
@@ -22,6 +49,7 @@ class Feedback extends React.Component {
 Feedback.propTypes = {
   assertions: PropTypes.number.isRequired,
   finalScore: PropTypes.number.isRequired,
+  history: PropTypes.shape.isRequired,
 };
 
 const mapStateToProps = (state) => ({
