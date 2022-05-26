@@ -39,6 +39,14 @@ body {
   min-height: 100vh;
 }
 
+.correctAnswer {
+  border: 3px solid rgb(6, 240, 15);
+}
+
+.wrongAnswer {
+  border: 3px solid red;
+}
+
 .App-link {
   color: #61dafb;
 }

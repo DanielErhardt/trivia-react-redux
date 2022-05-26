@@ -11,14 +11,61 @@ class Game extends React.Component {
 
     this.state = {
       questionNumber: 0,
+      currentQuestion: {
+        number: -1,
+        category: '',
+        question: '',
+        randomizedAnswers: [],
+      },
     };
   }
 
-  onQuestionAnswered = () => {
+  onClickNext = () => {
     const { questionNumber } = this.state;
     this.setState({
       questionNumber: questionNumber + 1,
     });
+  }
+
+  getCurrentQuestionObject = () => {
+    const { questionNumber, currentQuestion } = this.state;
+
+    if (currentQuestion.number === questionNumber) return currentQuestion;
+
+    const { questions } = this.props;
+
+    const {
+      category, question,
+      correct_answer: correctAnswer,
+      incorrect_answers: incorrectAnswers,
+    } = questions[questionNumber];
+
+    const answers = [correctAnswer, ...incorrectAnswers];
+
+    const mappedAnswers = answers.map((answer, index) => {
+      const correct = index === 0;
+      return {
+        correct,
+        index: index - 1,
+        text: answer,
+      };
+    });
+
+    const SORT_CONST = 0.5;
+    mappedAnswers.sort(() => Math.random() - SORT_CONST);
+
+    const newQuestion = {
+      number: questionNumber,
+      category,
+      question,
+      randomizedAnswers: mappedAnswers,
+    };
+
+    this.setState({
+      currentQuestion: newQuestion,
+    });
+
+    return newQuestion;
   }
 
   render() {
@@ -28,15 +75,16 @@ class Game extends React.Component {
       return (<Redirect to="/" />);
     }
 
-    const { questions } = this.props;
-    const { questionNumber } = this.state;
+    const currentQuestion = this.getCurrentQuestionObject();
+
+    console.log(currentQuestion);
 
     return (
       <div>
         <Header />
         <Question
-          questionInfo={ questions[questionNumber] }
-          onQuestionAnswered={ this.onQuestionAnswered }
+          questionInfo={ currentQuestion }
+          onClickNext={ this.onClickNext }
         />
       </div>
     );
@@ -52,8 +100,5 @@ const mapStateToProps = (state) => ({
   questions: state.game.questionsInfo,
   gameResponseCode: state.game.responseCode,
 });
-
-// const mapDispatchToProps = (dispatch) => ({
-// });
 
 export default connect(mapStateToProps)(Game);
